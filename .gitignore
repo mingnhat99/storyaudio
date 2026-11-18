@@ -1,0 +1,40 @@
+# ============================================================================
+# WHITELIST .gitignore — mọi thứ MẶC ĐỊNH BỊ IGNORE, chỉ những file nguồn được
+# liệt kê dưới đây mới vào repo. Thư mục workspace lẫn lộn giữa mã nguồn và
+# dữ liệu cá nhân (sách, audio, model, giọng clone) — whitelist để không bao
+# giờ lỡ tay commit dữ liệu đó. Muốn đưa file mới vào repo: thêm vào danh sách
+# "được track" bên dưới.
+# ============================================================================
+
+/*
+
+# ── Mã nguồn & tài liệu được track ──
+!/.gitignore
+!/LICENSE
+!/README.md
+!/README-APP.md
+!/HUONG-DAN-AUDIOBOOK.md
+!/audiobook.py
+!/tts_worker.py
+!/catalog.json
+!/setup_runtime.sh
+!/make_app.sh
+!/uninstall.sh
+!/gen_icon.swift
+!/icon-1024.png
+!/app/
+
+# ── Bỏ build artifacts của SwiftPM trong app/ ──
+app/.build/
+
+# ── Workspace tạm sinh ra khi chạy smoke test trong app/ ──
+app/books/
+app/build/
+app/output/
+app/.venv-engine/
+app/models/
+
+# ── Rác hệ thống (mọi nơi) ──
+**/.DS_Store
+**/__pycache__/
+*.pyc

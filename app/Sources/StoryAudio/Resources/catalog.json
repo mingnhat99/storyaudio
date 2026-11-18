@@ -1,0 +1,130 @@
+{
+  "version": 1,
+  "models": [
+    {
+      "id": "vieneu-nano",
+      "name": "VieNeu-TTS v3-Nano",
+      "engine": "vieneu",
+      "mode": "v3nano",
+      "description": "Siêu nhẹ: RAM đỉnh ~1.4GB, chỉ 1 core CPU, tốc độ ~1.3x realtime. Tiếng Việt rõ (24kHz). Phù hợp máy yếu hoặc cần chạy song song việc khác.",
+      "size_mb": 401,
+      "ram_gb": 1.5,
+      "sample_rate": 24000,
+      "quality": "Tốt (24kHz)",
+      "hardware_tier": "low",
+      "voice_clone": true,
+      "speed_control": true,
+      "license_url": "https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Nano",
+      "repos": [
+        {
+          "repo_id": "pnnbao-ump/VieNeu-TTS-v3-Nano",
+          "local_dir": "models/vieneu-nano",
+          "patterns": ["*"]
+        },
+        {
+          "repo_id": "pnnbao-ump/VieNeu-TTS-v3-Turbo",
+          "local_dir": "models/vieneu-nano",
+          "only_files": true,
+          "patterns": ["denoiser.onnx"]
+        }
+      ],
+      "require": [
+        "models/vieneu-nano/config.json",
+        "models/vieneu-nano/constants.npz",
+        "models/vieneu-nano/text_encoder.onnx",
+        "models/vieneu-nano/duration_predictor.onnx",
+        "models/vieneu-nano/vector_estimator.onnx",
+        "models/vieneu-nano/codec_decoder.onnx",
+        "models/vieneu-nano/denoiser.onnx"
+      ]
+    },
+    {
+      "id": "vieneu-turbo",
+      "name": "VieNeu-TTS v3-Turbo",
+      "engine": "vieneu",
+      "mode": "v3turbo",
+      "description": "Chất lượng tốt nhất (48kHz), đọc tiếng Anh/lẫn mã tốt hơn nano. RAM đỉnh ~4.4GB, khuyến nghị máy từ 8GB RAM trở lên.",
+      "size_mb": 608,
+      "ram_gb": 5.0,
+      "sample_rate": 48000,
+      "quality": "Cao nhất (48kHz)",
+      "hardware_tier": "mid",
+      "voice_clone": true,
+      "speed_control": false,
+      "license_url": "https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Turbo",
+      "repos": [
+        {
+          "repo_id": "pnnbao-ump/VieNeu-TTS-v3-Turbo",
+          "local_dir": "models/vieneu-backbone",
+          "patterns": [
+            "onnx_update/*", "denoiser.onnx", "speaker_encoder.onnx",
+            "config.json", "tokenizer.json", "tokenizer_config.json",
+            "special_tokens_map.json", "voices_v3_turbo.json"
+          ]
+        },
+        {
+          "repo_id": "OpenMOSS-Team/MOSS-Audio-Tokenizer-Nano-ONNX",
+          "local_dir": "models/moss-codec-onnx",
+          "patterns": ["*"]
+        }
+      ],
+      "require": [
+        "models/vieneu-backbone/onnx_update/vieneu_prefill.onnx",
+        "models/vieneu-backbone/onnx_update/vieneu_decode_step.onnx",
+        "models/vieneu-backbone/onnx_update/vieneu_acoustic_cached.onnx",
+        "models/vieneu-backbone/onnx_update/vieneu_backbone_shared.data",
+        "models/vieneu-backbone/onnx_update/vieneu_v3_heads.npz",
+        "models/vieneu-backbone/onnx_update/config.json",
+        "models/vieneu-backbone/onnx_update/tokenizer.json",
+        "models/vieneu-backbone/denoiser.onnx",
+        "models/vieneu-backbone/speaker_encoder.onnx",
+        "models/moss-codec-onnx/moss_audio_tokenizer_decode_full.onnx",
+        "models/moss-codec-onnx/moss_audio_tokenizer_encode.onnx",
+        "models/moss-codec-onnx/moss_audio_tokenizer_encode.data",
+        "models/moss-codec-onnx/moss_audio_tokenizer_decode_shared.data"
+      ]
+    },
+    {
+      "id": "kokoro-en",
+      "name": "Kokoro-82M (tiếng Anh, offline)",
+      "engine": "kokoro",
+      "mode": null,
+      "description": "TTS tiếng Anh offline chất lượng cao (Kokoro-82M, Apache-2.0): 28 giọng Mỹ/Anh tự nhiên, đọc tốt số/tên riêng. RAM ~1.2–1.5GB, tốc độ ~ngang realtime trên CPU Apple Silicon. Không clone giọng — dùng cho sách tiếng Anh.",
+      "size_mb": 354,
+      "ram_gb": 1.5,
+      "sample_rate": 24000,
+      "quality": "Tốt (24kHz offline)",
+      "hardware_tier": "low",
+      "voice_clone": false,
+      "speed_control": true,
+      "license_url": "https://huggingface.co/speaches-ai/Kokoro-82M-v1.0-ONNX",
+      "repos": [
+        {
+          "repo_id": "speaches-ai/Kokoro-82M-v1.0-ONNX",
+          "local_dir": "models/kokoro",
+          "patterns": ["model.onnx", "voices.bin"]
+        }
+      ],
+      "require": [
+        "models/kokoro/model.onnx",
+        "models/kokoro/voices.bin"
+      ]
+    },
+    {
+      "id": "edge-tts",
+      "name": "Edge-TTS (online, không cần tải)",
+      "engine": "edge",
+      "mode": null,
+      "description": "Giọng Microsoft Edge neural (tiếng Việt: Hoài My, Nam Minh…). Rất nhanh, miễn phí, cần mạng. Không hỗ trợ clone giọng, không chiếm đĩa.",
+      "size_mb": 0,
+      "ram_gb": 0.2,
+      "sample_rate": 24000,
+      "quality": "Tốt (neural online)",
+      "hardware_tier": "any",
+      "voice_clone": false,
+      "speed_control": true,
+      "no_download": true,
+      "license_url": "https://pypi.org/project/edge-tts/"
+    }
+  ]
+}
