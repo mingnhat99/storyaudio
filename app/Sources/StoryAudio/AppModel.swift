@@ -49,6 +49,10 @@ final class AppModel: ObservableObject {
     @Published var jobs: [RenderJob] = []
     @Published var currentJobId: String?
     @Published var queuePaused = false
+    /// Đang nghỉ làm mát giữa các chương — thời điểm hết nghỉ (nil = không nghỉ).
+    /// Job kế tiếp chỉ chạy sau khi hết nghỉ hoặc người dùng bấm "Bỏ nghỉ".
+    @Published var cooldownEndsAt: Date?
+    private var cooldownTask: Task<Void, Never>?
 
     // Giọng
     @Published var voices: [VoiceItem] = []
@@ -887,6 +891,8 @@ final class AppModel: ObservableObject {
     }
 
     private func dispatchNextJob() {
+        // đang nghỉ làm mát — job kế tiếp tự chạy khi hết nghỉ (skipCooldown)
+        guard cooldownTask == nil else { return }
         guard !queuePaused, currentJobId == nil,
               let idx = jobs.firstIndex(where: { $0.state == .queued })
         else { return }
@@ -1013,8 +1019,36 @@ final class AppModel: ObservableObject {
         if settings.restartWorkerBetweenChapters && jobs.contains(where: { $0.state == .queued }) {
             await restartWorkerKeepState()
         }
-        dispatchNextJob()
+        beginCooldownOrDispatch()
         updateSleepPrevention()
+    }
+
+    /// Sau khi xong một chương: bật nghỉ làm mát và còn job chờ thì đếm ngược
+    /// cho máy nguội bớt rồi mới dựng chương kế, không thì chạy luôn.
+    private func beginCooldownOrDispatch() {
+        let restSec = settings.cooldownMinutes * 60
+        guard restSec > 0, !queuePaused,
+              jobs.contains(where: { $0.state == .queued })
+        else {
+            dispatchNextJob()
+            return
+        }
+        cooldownEndsAt = Date().addingTimeInterval(restSec)
+        cooldownTask = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: UInt64(restSec * 1_000_000_000))
+            guard !Task.isCancelled, let self else { return }
+            self.cooldownTask = nil
+            self.cooldownEndsAt = nil
+            self.dispatchNextJob()
+        }
+    }
+
+    /// Bỏ dở thời gian nghỉ làm mát — chạy ngay chương kế tiếp trong hàng đợi.
+    func skipCooldown() {
+        cooldownTask?.cancel()
+        cooldownTask = nil
+        cooldownEndsAt = nil
+        dispatchNextJob()
     }
 
     private func markJob(_ id: String, state: JobState, error: String? = nil,
@@ -1039,6 +1073,10 @@ final class AppModel: ObservableObject {
                 jobs[idx].finishedAt = Date()
             }
             // đang render: trạng thái cuối do phản hồi render quyết định (cancelled)
+        }
+        // đang nghỉ làm mát mà hết job chờ → bỏ nghỉ luôn, khỏi đợi vô ích
+        if cooldownTask != nil, !jobs.contains(where: { $0.state == .queued }) {
+            skipCooldown()
         }
     }
 

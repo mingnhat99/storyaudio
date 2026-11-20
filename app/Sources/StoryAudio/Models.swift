@@ -70,6 +70,7 @@ struct AppSettings: Codable, Equatable {
     var hfMirror: String = ""             // rỗng = HF chính thức
     var restartWorkerBetweenChapters: Bool = false
     var restartWorkerRssMb: Double = 0    // 0 = tắt
+    var cooldownMinutes: Double = 0       // >0 = nghỉ giữa các chương cho máy nguội
 
     // Player
     var playbackRate: Float = 1.0
@@ -95,7 +96,7 @@ struct AppSettings: Codable, Equatable {
         case autoHardwarePreset, threads, partChars, silenceSec
         case outFormat, outDirPath, namePattern, cleanupParts, openFolderWhenDone
         case sampling, globalRules, hfMirror
-        case restartWorkerBetweenChapters, restartWorkerRssMb
+        case restartWorkerBetweenChapters, restartWorkerRssMb, cooldownMinutes
         case playbackRate, progressiveListen
         case modelLicenseAccepted, termsAcceptedVersion
     }
@@ -128,6 +129,7 @@ struct AppSettings: Codable, Equatable {
         restartWorkerBetweenChapters = try c.decodeIfPresent(Bool.self,
                                                              forKey: .restartWorkerBetweenChapters) ?? false
         restartWorkerRssMb = try c.decodeIfPresent(Double.self, forKey: .restartWorkerRssMb) ?? 0
+        cooldownMinutes = try c.decodeIfPresent(Double.self, forKey: .cooldownMinutes) ?? 0
         playbackRate = try c.decodeIfPresent(Float.self, forKey: .playbackRate) ?? 1.0
         progressiveListen = try c.decodeIfPresent(Bool.self, forKey: .progressiveListen) ?? true
         modelLicenseAccepted = try c.decodeIfPresent([String: Int].self,

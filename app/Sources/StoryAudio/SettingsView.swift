@@ -288,6 +288,16 @@ struct SettingsView: View {
 
     // MARK: Nâng cao
 
+    /// Nhãn slider nghỉ làm mát: "Tắt" khi 0; phút lẻ (0.5) mới hiện thập phân.
+    private var cooldownLabel: String {
+        let m = store.settings.cooldownMinutes
+        guard m > 0 else { return "Nghỉ làm mát: Tắt" }
+        if m.truncatingRemainder(dividingBy: 1) == 0 {
+            return "Nghỉ làm mát: \(Int(m)) phút"
+        }
+        return String(format: "Nghỉ làm mát: %.1f phút", m)
+    }
+
     @ViewBuilder
     private var advancedSection: some View {
         Section("Tham số sinh audio (VieNeu)") {
@@ -323,6 +333,16 @@ struct SettingsView: View {
             Toggle("Khởi động lại worker sau mỗi chương (giải phóng RAM)",
                    isOn: Binding(get: { store.settings.restartWorkerBetweenChapters },
                                  set: { store.settings.restartWorkerBetweenChapters = $0 }))
+            HStack {
+                Slider(value: Binding(get: { store.settings.cooldownMinutes },
+                                      set: { store.settings.cooldownMinutes = $0 }),
+                       in: 0...30, step: 0.5)
+                Text(cooldownLabel)
+                    .monospacedDigit().frame(width: 210, alignment: .leading)
+            }
+            Text("Dựng liên tục nhiều chương có thể làm nóng máy. Bật nghỉ này để sau mỗi chương " +
+                 "app chờ máy nguội bớt rồi mới dựng chương kế — chỉnh 0 phút để tắt.")
+                .font(.caption).foregroundStyle(.tertiary)
             HStack {
                 TextField("Mirror Hugging Face", text: Binding(
                     get: { store.settings.hfMirror },

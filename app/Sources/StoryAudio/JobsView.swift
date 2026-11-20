@@ -8,6 +8,10 @@ struct JobsView: View {
         VStack(spacing: 0) {
             jobsHeader
 
+            if let endsAt = app.cooldownEndsAt {
+                CooldownBanner(endsAt: endsAt)
+            }
+
             if let job = app.currentJob {
                 CurrentJobCard(job: job)
             }
@@ -136,6 +140,42 @@ struct JobsView: View {
         case .done: return DS.success
         case .failed: return DS.danger
         case .cancelled: return DS.warning
+        }
+    }
+}
+
+/// Banner nghỉ làm mát giữa các chương: đếm ngược thời gian còn nghỉ và
+/// nút bỏ nghỉ để chạy ngay chương kế.
+struct CooldownBanner: View {
+    @EnvironmentObject var app: AppModel
+    let endsAt: Date
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 1)) { timeline in
+            let remaining = max(endsAt.timeIntervalSince(timeline.date), 0)
+            HStack(spacing: 14) {
+                Image(systemName: "snowflake")
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundStyle(DS.accent)
+                    .symbolEffect(.pulse)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Đang nghỉ cho máy nguội — \(formatClock(remaining)) nữa")
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .foregroundStyle(DS.ink)
+                    Text("Chương kế tiếp tự chạy khi hết nghỉ. Điều chỉnh trong Cài đặt → Nâng cao.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+                Spacer()
+                Button {
+                    app.skipCooldown()
+                } label: {
+                    Label("Bỏ nghỉ, chạy ngay", systemImage: "play.fill")
+                }
+                .buttonStyle(.soft)
+                .help("Không đợi hết thời gian nghỉ, dựng chương kế ngay")
+            }
+            .padding(14)
+            .card(cornerRadius: 14)
         }
     }
 }

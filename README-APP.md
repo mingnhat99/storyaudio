@@ -107,7 +107,9 @@ App **không bundle sẵn model** — onboarding 3 bước:
   tốc độ lúc nghe (player)
 - **Xuất file**: M4A/MP3/WAV; thư mục đích; mẫu tên `{book} - {index:02d}. {title}`
 - **Quy tắc tìm–thay thế** (toàn cục + theo sách): sửa tên riêng/từ cứng trước khi dựng
-- Nâng cao: temperature/top-K/phạt lặp; khởi động lại worker sau mỗi chương (giải phóng RAM)
+- Nâng cao: temperature/top-K/phạt lặp; khởi động lại worker sau mỗi chương (giải phóng RAM);
+  **nghỉ làm mát** giữa các chương trong hàng đợi (0–30 phút, mặc định tắt) — dựng liên tục
+  nhiều chương làm nóng máy thì app chờ máy nguội bớt rồi mới dựng chương kế, bỏ nghỉ được bất cứ lúc nào
 
 ## Gỡ cài đặt
 
