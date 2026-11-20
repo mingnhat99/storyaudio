@@ -267,13 +267,35 @@ final class AppModel: ObservableObject {
         }
     }
 
+    /// Bundle tài nguyên SPM (tts_worker.py, catalog.json, setup_runtime.sh).
+    /// Không đụng trực tiếp `Bundle.module`: accessor SPM gọi fatalError khi
+    /// không tìm thấy StoryAudio_StoryAudio.bundle — bản .app đóng gói thiếu
+    /// bundle này crash ngay khi chọn thư mục lần đầu và crash luôn các lần
+    /// mở sau (trên máy dev có fallback đường dẫn .build nên lỗi không lộ).
+    /// Tự dò an toàn: Contents/Resources trong .app, hoặc cạnh binary khi
+    /// chạy trần qua swift run — không thấy thì trả nil, caller tự báo lỗi.
+    private static let assetsBundle: Bundle? = {
+        for dir in [Bundle.main.resourceURL, Bundle.main.bundleURL].compactMap({ $0 }) {
+            if let b = Bundle(url: dir.appendingPathComponent("StoryAudio_StoryAudio.bundle")) {
+                return b
+            }
+        }
+        return nil
+    }()
+
     private func ensureWorkerAssets() {
         let fm = FileManager.default
         try? fm.createDirectory(at: workspaceURL, withIntermediateDirectories: true)
+        guard let assets = Self.assetsBundle else {
+            workerLog.append("Lỗi đóng gói app: thiếu StoryAudio_StoryAudio.bundle "
+                             + "(tts_worker.py, catalog.json, setup_runtime.sh). "
+                             + "Hãy tải lại bản cài mới hoặc builds lại bằng make_app.sh.")
+            return
+        }
         let names = ["tts_worker.py", "catalog.json", "setup_runtime.sh"]
         for name in names {
-            guard let bundled = Bundle.module.url(forResource: (name as NSString).deletingPathExtension,
-                                                  withExtension: (name as NSString).pathExtension)
+            guard let bundled = assets.url(forResource: (name as NSString).deletingPathExtension,
+                                           withExtension: (name as NSString).pathExtension)
             else { continue }
             let dest = workspaceURL.appendingPathComponent(name)
             let bundledData = (try? Data(contentsOf: bundled)) ?? Data()

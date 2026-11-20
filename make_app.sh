@@ -13,9 +13,14 @@ rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 
 cp "$BIN" "$APP/Contents/MacOS/StoryAudio"
-cp "$ROOT/app/Sources/StoryAudio/Resources/tts_worker.py" "$APP/Contents/Resources/"
-cp "$ROOT/app/Sources/StoryAudio/Resources/catalog.json" "$APP/Contents/Resources/"
-cp "$ROOT/app/Sources/StoryAudio/Resources/setup_runtime.sh" "$APP/Contents/Resources/"
+# Tài nguyên phải nằm trong StoryAudio_StoryAudio.bundle — app đọc qua bundle
+# SPM, copy trải phẳng vào Contents/Resources app sẽ không thấy (bản cũ thiếu
+# bundle này crash trên máy người dùng mới ngay khi chọn thư mục làm việc).
+SPM_RES="$APP/Contents/Resources/StoryAudio_StoryAudio.bundle"
+mkdir -p "$SPM_RES"
+cp "$ROOT/app/Sources/StoryAudio/Resources/tts_worker.py" "$SPM_RES/"
+cp "$ROOT/app/Sources/StoryAudio/Resources/catalog.json" "$SPM_RES/"
+cp "$ROOT/app/Sources/StoryAudio/Resources/setup_runtime.sh" "$SPM_RES/"
 if [ -f "$ROOT/app/AppIcon.icns" ]; then
 	cp "$ROOT/app/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
 fi
