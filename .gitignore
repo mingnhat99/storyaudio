@@ -19,6 +19,7 @@
 !/catalog.json
 !/setup_runtime.sh
 !/make_app.sh
+!/make_dmg.sh
 !/uninstall.sh
 !/gen_icon.swift
 !/icon-1024.png

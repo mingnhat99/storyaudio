@@ -7,6 +7,10 @@ import UniformTypeIdentifiers
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.activate(ignoringOtherApps: true)
+        // Tự cài vào Applications khi chạy từ DMG: hỏi 1 lần, bấm là app tự
+        // chuyển + mở lại từ Applications (terminate ngay trong hàm — không
+        // tới phần launch bên dưới). Từ chối → chạy tiếp, lần mở sau hỏi lại.
+        AppInstaller.promptIfNeeded()
         for w in NSApp.windows where w.contentView != nil {
             w.makeKeyAndOrderFront(nil)
         }

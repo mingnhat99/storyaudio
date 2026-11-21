@@ -12,9 +12,13 @@
 set -euo pipefail
 
 APP_SUPPORT="$HOME/Library/Application Support/StoryAudio"
-# Workspace = thư mục chứa script này; app nằm trong <workspace>/build-app (do make_app.sh tạo)
+# Workspace = thư mục chứa script này
 WS="$(cd "$(dirname "$0")" && pwd)"
-APP="$WS/build-app/StoryAudio.app"
+# Tìm app theo thứ tự cài đặt thực tế: /Applications (tự cài qua AppInstaller)
+# → ~/Applications (máy hạn quyền) → build-app trong workspace (bản build thủ công)
+APP="/Applications/StoryAudio.app"
+[ -d "$APP" ] || APP="$HOME/Applications/StoryAudio.app"
+[ -d "$APP" ] || APP="$WS/build-app/StoryAudio.app"
 
 DATA_ONLY=0; DO_ALL=0; DO_APP=1
 for arg in "$@"; do

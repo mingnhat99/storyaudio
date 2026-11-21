@@ -4,8 +4,21 @@ App desktop native (SwiftUI) bọc pipeline VieNeu-TTS sẵn có của bạn. M�
 qua worker Python (`tts_worker.py`) trong venv của thư mục làm việc.
 
 **File app:** `build-app/StoryAudio.app` (đã build + ký ad-hoc; build lại bằng `./make_app.sh`)
+**File phát hành:** `build-app/StoryAudio-<version>.dmg` — build bằng `./make_dmg.sh`
+(sau `./make_app.sh`; DMG có sẵn shortcut Applications, sắp icon qua Finder)
 
 ## Khởi động lần đầu (máy chưa có gì)
+
+**Tự cài vào Applications** — mở app lần đầu từ file .dmg, app sẽ hỏi
+*"Chuyển StoryAudio vào Applications?"*: bấm 1 nút là app tự copy vào Applications rồi
+khởi động lại từ đó, **không cần kéo thả thủ công**. Từ chối thì app vẫn chạy, nhưng lần
+mở sau sẽ hỏi lại cho tới khi cài xong. Nếu đích đã có bản khác phiên bản → bản cũ tự
+vào Thùng rác (khôi phục được), bản mới copy đè. Dữ liệu (thư viện, vị trí nghe,
+workspace, venv) nằm ngoài app bundle nên chuyển chỗ không mất gì.
+
+> Debug hộp thoại tự cài không cần mount DMG thật:
+> `defaults write com.storyaudio.app debugAlwaysOfferInstall -bool true`
+> (tắt: `defaults delete com.storyaudio.app debugAlwaysOfferInstall`)
 
 App **không bundle sẵn model** — onboarding 3 bước:
 
