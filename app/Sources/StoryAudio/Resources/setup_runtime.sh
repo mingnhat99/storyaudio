@@ -7,7 +7,15 @@
 #   SA_FORCE_MANAGED_PY=1    — bỏ qua Python trên máy, bắt buộc tải Python chuẩn
 set -o pipefail
 WS="${1:?thiếu tham số thư mục làm việc}"
-cd "$WS" || exit 1
+cd "$WS" || { echo "Không truy cập được thư mục làm việc '$WS' — kiểm tra quyền rồi thử lại."; exit 1; }
+
+# Runtime (~2GB) + model (~0.5GB) — hết đĩa giữa chừng là pip báo lỗi khó hiểu
+avail_gb="$(df -g "$WS" 2>/dev/null | awk 'NR==2 {print $4}')"
+if [ -n "$avail_gb" ] && [ "$avail_gb" -lt 3 ]; then
+  echo "Ổ chứa thư mục làm việc chỉ còn ${avail_gb}GB trống — cần khoảng 3GB."
+  echo "Dọn bớt đĩa hoặc chọn thư mục làm việc trên ổ khác rồi thử lại."
+  exit 1
+fi
 
 # App chạy GUI (mở từ Finder/Dock) chỉ nhận PATH tối thiểu (/usr/bin:/bin:…) —
 # thêm sẵn các chỗ Homebrew/MacPorts hay cài Python để tìm được bản đủ mới
@@ -75,7 +83,9 @@ install_managed_python() {
     fi
   fi
   tar -xzf ".python/$asset" -C .python || {
-    echo "Giải nén Python thất bại — vui lòng thử lại." >&2; return 1; }
+    echo "Giải nén Python thất bại — ổ chứa thư mục làm việc có thể không hỗ trợ" >&2
+    echo "symlink (FAT32/exFAT) hoặc đang đồng bộ iCloud. Chọn thư mục làm việc" >&2
+    echo "trong ổ chính của Mac (APFS) rồi thử lại." >&2; return 1; }
   rm -f ".python/$asset" ".python/SHA256SUMS"
   p="$WS/.python/python/bin/python3.12"
   [ -x "$p" ] || p="$WS/.python/python/bin/python3"
@@ -103,7 +113,12 @@ if [ ! -x "$WS/.venv-engine/bin/python" ]; then
     echo "Dùng $($PY --version) (Python app tự tải vào .python)…"
   fi
   echo "Tạo venv .venv-engine..."
-  "$PY" -m venv .venv-engine || exit 1
+  "$PY" -m venv .venv-engine || {
+    echo "Tạo venv thất bại. Thư mục làm việc có thể nằm trên ổ không hỗ trợ symlink"
+    echo "(FAT32/exFAT, USB định dạng cũ) hoặc không ghi được — chọn thư mục trong"
+    echo "ổ chính của Mac (APFS) rồi thử lại."
+    exit 1
+  }
 fi
 
 "$WS/.venv-engine/bin/pip" install --upgrade pip 2>&1 | tail -1

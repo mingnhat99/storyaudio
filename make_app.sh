@@ -4,15 +4,23 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT/app"
 
-echo "==> swift build -c release"
-swift build -c release
+# Build 2 arch riêng rồi ghép universal: chỉ cần Command Line Tools (multi-arch
+# SwiftPM thì đòi Xcode/xcbuild). Không có bản Intel thì app chết ngay khi mở.
+echo "==> swift build -c release (universal: arm64 + x86_64 cho cả Mac Intel)"
+swift build -c release --triple arm64-apple-macosx
+swift build -c release --triple x86_64-apple-macosx
 
-BIN="$ROOT/app/.build/release/StoryAudio"
+BIN_ARM="$ROOT/app/.build/arm64-apple-macosx/release/StoryAudio"
+BIN_X86="$ROOT/app/.build/x86_64-apple-macosx/release/StoryAudio"
+UNI="$ROOT/build-app/.StoryAudio-universal.tmp"
+lipo -create -output "$UNI" "$BIN_ARM" "$BIN_X86"
+BIN="$UNI"
 APP="$ROOT/build-app/StoryAudio.app"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 
 cp "$BIN" "$APP/Contents/MacOS/StoryAudio"
+rm -f "$UNI"
 # Tài nguyên phải nằm trong StoryAudio_StoryAudio.bundle — app đọc qua bundle
 # SPM, copy trải phẳng vào Contents/Resources app sẽ không thấy (bản cũ thiếu
 # bundle này crash trên máy người dùng mới ngay khi chọn thư mục làm việc).
