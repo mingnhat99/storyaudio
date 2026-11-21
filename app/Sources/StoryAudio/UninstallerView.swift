@@ -45,7 +45,7 @@ struct UninstallerView: View {
                             SectionTitle(text: "Tùy chọn — đọc kỹ trước khi bật")
                             Toggle("Sách đã import + audio trong output/ + file đoạn tạm build/", isOn: $opts.booksAndOutput)
                             Toggle("Model TTS trong models/ (~610MB — tải lại được qua Model Manager)", isOn: $opts.models)
-                            Toggle("Venv .venv-engine (chỉ có trên máy app tự cài runtime)", isOn: $opts.venvEngine)
+                            Toggle("Venv .venv-engine + Python .python (runtime app tự cài trên máy mới)", isOn: $opts.venvEngine)
                             Toggle("File worker app copy vào thư mục làm việc (tts_worker.py, catalog.json, setup_runtime.sh)", isOn: $opts.workerFiles)
                         }
                         .padding(16)

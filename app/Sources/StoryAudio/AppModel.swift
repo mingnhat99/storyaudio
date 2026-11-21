@@ -1432,6 +1432,8 @@ final class AppModel: ObservableObject {
         }
         if opts.venvEngine {
             try? fm.removeItem(at: workspaceURL.appendingPathComponent(".venv-engine"))
+            // Python chuẩn app tự tải khi máy không có Python >= 3.10
+            try? fm.removeItem(at: workspaceURL.appendingPathComponent(".python"))
         }
         if opts.workerFiles {
             for f in ["tts_worker.py", "catalog.json", "setup_runtime.sh"] {

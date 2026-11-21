@@ -120,7 +120,7 @@ struct RuntimeStep: View {
             Image(systemName: "terminal")
                 .font(.system(size: 48, design: .rounded)).foregroundStyle(.tint)
             Text("Cài runtime TTS").font(.title2.bold())
-            Text("App cần môi trường Python với thư viện VieNeu-TTS (~2GB dung lượng tải lần đầu).\nSẽ tạo venv `.venv-engine` trong thư mục làm việc và cài từ PyPI.")
+            Text("App cần môi trường Python với thư viện VieNeu-TTS (~2GB dung lượng tải lần đầu).\nSẽ tạo venv `.venv-engine` trong thư mục làm việc và cài từ PyPI. Máy chưa có Python ≥ 3.10 thì app tự tải Python chuẩn (~25MB thêm).")
                 .multilineTextAlignment(.center).foregroundStyle(.secondary)
 
             if app.runtimeSetupRunning {
